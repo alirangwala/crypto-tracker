@@ -2,11 +2,11 @@ import React, { useState } from "react";
 import { IAddress, ITransaction } from "../page";
 
 interface AddressListProps {
-  setAddresses: (addresses: IAddress[]) => void;
   addresses: IAddress[] | null;
+  handleAddAddress: (data: any) => void;
 }
 
-const AddressInput = ({ setAddresses, addresses }: AddressListProps) => {
+const AddressInput = ({ handleAddAddress, addresses }: AddressListProps) => {
   const [input, setInput] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -58,11 +58,8 @@ const AddressInput = ({ setAddresses, addresses }: AddressListProps) => {
         last_updated: current_datetime,
         transactions: formatTransactions(data.txs),
       };
-      if (addresses) {
-        setAddresses([...addresses, formattedData]);
-      } else {
-        setAddresses([formattedData]);
-      }
+      await handleAddAddress(formattedData);
+
       setError(null);
       setInput("");
     } catch (err) {
