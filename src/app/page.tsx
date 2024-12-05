@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import AddressList from "./components/AddressList";
 import AddressInput from "./components/AddressInput";
+import AggregatedAddresses from "./components/AggregatedAddresses";
 
 export interface IAddress {
   id: string;
@@ -74,6 +75,7 @@ export default function Home() {
         addresses={addresses}
         onDeleteAddress={handleDeleteAddress}
       />
+      <AggregatedAddresses addresses={addresses} />
     </div>
   );
 }
