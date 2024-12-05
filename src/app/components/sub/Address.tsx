@@ -13,6 +13,14 @@ interface AddressProps {
 const Address = ({ address, onDelete }: AddressProps) => {
   const [expand, setExpand] = useState(false);
 
+  const formatNumber = (num: number | undefined) => {
+    return num?.toLocaleString() || "0";
+  };
+
+  const formatBalance = (balance: number | undefined) => {
+    return ((balance || 0) / 100000000).toFixed(8);
+  };
+
   return (
     <div className="border-b border-gray-100 last:border-none">
       <div className="p-6">
@@ -38,14 +46,14 @@ const Address = ({ address, onDelete }: AddressProps) => {
               <div>
                 <div className="text-sm text-gray-500">Balance</div>
                 <div className="font-semibold text-gray-900">
-                  {(address.current_balance / 100000000).toFixed(8)} BTC
+                  {formatBalance(address.current_balance)} BTC
                 </div>
               </div>
 
               <div>
                 <div className="text-sm text-gray-500">Transactions</div>
                 <div className="font-semibold text-gray-900">
-                  {address.number_txns.toLocaleString()}
+                  {formatNumber(address.number_txns)}
                 </div>
               </div>
 

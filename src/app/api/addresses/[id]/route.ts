@@ -6,7 +6,7 @@ export async function DELETE(
   context: { params: { id: string } }
 ) {
   try {
-    const id = await context.params.id;
+    const { id } = await context.params;
     const address = await prisma.address.findUnique({
       where: { id },
     });

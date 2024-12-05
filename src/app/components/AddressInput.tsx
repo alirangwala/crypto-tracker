@@ -58,6 +58,7 @@ const AddressInput = ({ handleAddAddress, addresses }: AddressListProps) => {
         last_updated: current_datetime,
         transactions: formatTransactions(data.txs),
       };
+
       await handleAddAddress(formattedData);
 
       setError(null);
