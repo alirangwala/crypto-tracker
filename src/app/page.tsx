@@ -3,23 +3,23 @@ import { useState } from "react";
 import AddressList from "./components/AddressList";
 import AddressInput from "./components/AddressInput";
 
-export interface AddressData {
+export interface IAddress {
   id: string;
   number_txns: number;
   total_received: number;
   total_sent: number;
   current_balance: number;
   last_updated: string | number;
-  transactions: Transaction[];
+  transactions: ITransaction[];
 }
-export interface Transaction {
+export interface ITransaction {
   id: string;
   type: "sent" | "received";
   amount: number;
   timestamp: string;
 }
 
-export const sampleAddressData: AddressData[] = [
+export const sampleAddressData: IAddress[] = [
   {
     id: "123",
     number_txns: 5,
@@ -46,7 +46,7 @@ export const sampleAddressData: AddressData[] = [
   },
 ];
 
-const sampleTransactions: Record<string, Transaction[]> = {
+const sampleTransactions: Record<string, ITransaction[]> = {
   "123": [
     { id: "tx1", type: "received", amount: 50, timestamp: "2024-03-01" },
     { id: "tx2", type: "sent", amount: 20, timestamp: "2024-03-02" },
@@ -55,13 +55,13 @@ const sampleTransactions: Record<string, Transaction[]> = {
 };
 
 export default function Home() {
-  const [addresses, setAddresses] = useState<AddressData[] | null>(
+  const [addresses, setAddresses] = useState<IAddress[] | null>(
     sampleAddressData
   );
   return (
     <div>
       <AddressInput setAddresses={setAddresses} addresses={addresses} />
-      <AddressList addresses={addresses} />
+      <AddressList addresses={addresses} setAddresses={setAddresses} />
     </div>
   );
 }

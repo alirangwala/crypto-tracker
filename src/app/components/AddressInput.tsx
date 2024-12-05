@@ -1,17 +1,17 @@
 import React, { useState } from "react";
-import { AddressData, Transaction } from "../page";
+import { IAddress, ITransaction } from "../page";
 
 interface AddressListProps {
-  setAddresses: (addresses: AddressData[]) => void;
-  addresses: AddressData[] | null;
+  setAddresses: (addresses: IAddress[]) => void;
+  addresses: IAddress[] | null;
 }
 
 const AddressInput = ({ setAddresses, addresses }: AddressListProps) => {
-  const [address, setAddress] = useState<AddressData | null>(null);
   const [input, setInput] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const formatTransactions = (txList: any, limit = 10): Transaction[] => {
+  const formatTransactions = (txList: any, limit = 10): ITransaction[] => {
     if (!Array.isArray(txList)) {
       return [];
     }
@@ -27,15 +27,26 @@ const AddressInput = ({ setAddresses, addresses }: AddressListProps) => {
     try {
       const apiUrl = `https://blockchain.info/rawaddr/${addressHash}`;
       const response = await fetch(apiUrl);
-      const data = await response.json();
-      if (data.error) {
+
+      if (response.status == 404) {
         setError("Please enter a valid address");
+        setInput("");
+        return;
+      }
+      const data = await response.json();
+
+      if (
+        addresses &&
+        addresses?.some((address) => address.id === data.address)
+      ) {
+        setError("Address has already been added");
+        setInput("");
         return;
       }
 
       let current_datetime = Date.now();
 
-      const formattedData: AddressData = {
+      const formattedData: IAddress = {
         id: data.address,
         number_txns: data.n_tx,
         total_received: data.total_received,
@@ -49,6 +60,8 @@ const AddressInput = ({ setAddresses, addresses }: AddressListProps) => {
       } else {
         setAddresses([formattedData]);
       }
+      setError(null);
+      setInput("");
     } catch (err) {
       setError(`Failed to fetch address data`);
     }
@@ -64,19 +77,39 @@ const AddressInput = ({ setAddresses, addresses }: AddressListProps) => {
   };
 
   return (
-    <div>
-      <span>Add an Address</span>
-      <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          value={input}
-          onChange={handleChange}
-          placeholder="Type here"
-          className="mt-2 input input-bordered w-1/2 text-gray-700 placeholder-gray-400"
-        />
-        <div className="text-right">
-          <button className="btn btn-primary px-6 py-2">Add Address</button>
+    <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
+      <h2 className="text-lg font-semibold text-gray-900 mb-4">
+        Add Bitcoin Address
+      </h2>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="flex flex-col md:flex-row gap-4">
+          <input
+            type="text"
+            value={input}
+            onChange={handleChange}
+            placeholder="Enter Bitcoin address"
+            disabled={isLoading}
+            className="flex-1 rounded-md border border-gray-300 px-4 py-2
+                     focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
+                     disabled:bg-gray-100 disabled:cursor-not-allowed
+                     text-gray-700 placeholder-gray-400"
+          />
+          <button
+            type="submit"
+            disabled={isLoading || !input.trim()}
+            className="bg-blue-500 text-white px-6 py-2 rounded-md
+                     hover:bg-blue-600 transition-colors duration-200
+                     disabled:bg-blue-300 disabled:cursor-not-allowed
+                     focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+          >
+            {isLoading ? "Adding..." : "Add Address"}
+          </button>
         </div>
+        {error && (
+          <div className="text-red-500 text-sm bg-red-50 border border-red-200 rounded-md p-3">
+            {error}
+          </div>
+        )}
       </form>
     </div>
   );
