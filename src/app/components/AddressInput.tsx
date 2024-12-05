@@ -15,12 +15,15 @@ const AddressInput = ({ setAddresses, addresses }: AddressListProps) => {
     if (!Array.isArray(txList)) {
       return [];
     }
-    return txList.slice(0, limit).map((tx) => ({
-      id: tx.hash,
-      type: tx.result < 0 ? "sent" : "received",
-      amount: Math.abs(tx.result) / 100000000,
-      timestamp: new Date(tx.time * 1000).toISOString(),
-    }));
+    return txList
+      .sort((a, b) => b.time - a.time)
+      .slice(0, limit)
+      .map((tx) => ({
+        id: tx.hash,
+        type: tx.result < 0 ? "sent" : "received",
+        amount: Math.abs(tx.result) / 100000000,
+        timestamp: new Date(tx.time * 1000).toISOString(),
+      }));
   };
 
   const fetchAddress = async (addressHash: string) => {

@@ -1,0 +1,27 @@
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Address {
+  id             String        @id
+  number_txns    Int
+  total_received Float
+  total_sent     Float
+  current_balance Float
+  last_updated   DateTime
+  transactions   Transaction[]
+}
+
+model Transaction {
+  id        String   @id
+  type      String  
+  amount    Float
+  timestamp DateTime
+  address   Address  @relation(fields: [addressId], references: [id])
+  addressId String
+}

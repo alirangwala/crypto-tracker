@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import AddressList from "./components/AddressList";
 import AddressInput from "./components/AddressInput";
 
@@ -19,49 +19,64 @@ export interface ITransaction {
   timestamp: string;
 }
 
-export const sampleAddressData: IAddress[] = [
-  {
-    id: "123",
-    number_txns: 5,
-    total_received: 123,
-    total_sent: 23,
-    current_balance: 100,
-    last_updated: "11/10/1993",
-    transactions: [
-      { id: "234312", type: "sent", amount: -5, timestamp: "11/10/1993" },
-      { id: "234312", type: "sent", amount: -5, timestamp: "11/10/1993" },
-    ],
-  },
-  {
-    id: "124",
-    number_txns: 6,
-    total_received: 22,
-    total_sent: 1,
-    current_balance: 21,
-    last_updated: "11/10/1993",
-    transactions: [
-      { id: "234312", type: "sent", amount: -5, timestamp: "11/10/1993" },
-      { id: "234312", type: "sent", amount: -5, timestamp: "11/10/1993" },
-    ],
-  },
-];
-
-const sampleTransactions: Record<string, ITransaction[]> = {
-  "123": [
-    { id: "tx1", type: "received", amount: 50, timestamp: "2024-03-01" },
-    { id: "tx2", type: "sent", amount: 20, timestamp: "2024-03-02" },
-  ],
-  "124": [{ id: "tx3", type: "received", amount: 21, timestamp: "2024-03-03" }],
-};
-
 export default function Home() {
-  const [addresses, setAddresses] = useState<IAddress[] | null>(
-    sampleAddressData
-  );
+  const [addresses, setAddresses] = useState<IAddress[] | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    fetchAddresses();
+  }, []);
+
+  const fetchAddresses = async () => {
+    try {
+      const response = await fetch("/api/addresses");
+      const data = await response.json();
+      setAddresses(data);
+    } catch (error) {
+      console.error("Failed to fetch addresses:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleDeleteAddress = async (addressId: string) => {
+    try {
+      await fetch(`/api/addresses/${addressId}`, {
+        method: "DELETE",
+      });
+      setAddresses(addresses?.filter((addr) => addr.id !== addressId) || null);
+    } catch (error) {
+      console.error("Failed to delete address:", error);
+    }
+  };
+
+  const handleAddAddress = async (address: IAddress) => {
+    try {
+      const response = await fetch("/api/addresses", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(address),
+      });
+      const newAddress = await response.json();
+      setAddresses((prev) => (prev ? [...prev, newAddress] : [newAddress]));
+    } catch (error) {
+      console.error("Failed to add address:", error);
+    }
+  };
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <div>
       <AddressInput setAddresses={setAddresses} addresses={addresses} />
-      <AddressList addresses={addresses} setAddresses={setAddresses} />
+      <AddressList
+        addresses={addresses}
+        onDeleteAddress={handleDeleteAddress}
+      />
     </div>
   );
 }

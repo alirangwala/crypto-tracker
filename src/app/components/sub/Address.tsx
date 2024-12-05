@@ -13,15 +13,10 @@ interface AddressProps {
 const Address = ({ address, onDelete }: AddressProps) => {
   const [expand, setExpand] = useState(false);
 
-  const handleDelete = () => {
-    onDelete(address.id);
-  };
-
   return (
     <div className="border-b border-gray-100 last:border-none">
       <div className="p-6">
         <div className="flex items-start justify-between gap-4">
-          {/* Main Address Info */}
           <div className="flex-1 space-y-3">
             <div className="flex items-center gap-2">
               <button
@@ -29,9 +24,9 @@ const Address = ({ address, onDelete }: AddressProps) => {
                 className="text-gray-500 hover:text-gray-700 transition-colors"
               >
                 {expand ? (
-                  <MdOutlineExpandMore size={20} />
-                ) : (
                   <MdOutlineExpandLess size={20} />
+                ) : (
+                  <MdOutlineExpandMore size={20} />
                 )}
               </button>
               <span className="font-mono text-sm text-gray-800 break-all">
@@ -62,18 +57,14 @@ const Address = ({ address, onDelete }: AddressProps) => {
               </div>
             </div>
           </div>
-
-          {/* Delete Button */}
           <button
-            onClick={handleDelete}
+            onClick={() => onDelete(address.id)}
             className="text-gray-400 hover:text-red-500 transition-colors p-1"
           >
             <FaRegTrashCan size={16} />
           </button>
         </div>
       </div>
-
-      {/* Expanded Transactions Section */}
       {expand && (
         <div className="border-t border-gray-100 bg-gray-50">
           <div className="p-6">

@@ -5,16 +5,10 @@ import Address from "./sub/Address";
 
 interface AddressListProps {
   addresses: IAddress[] | null;
-  setAddresses: (addresses: IAddress[] | null) => void;
+  onDeleteAddress: (id: string) => void;
 }
 
-const AddressList = ({ addresses, setAddresses }: AddressListProps) => {
-  const handleDelete = (addressId: string) => {
-    if (!addresses) return;
-    const updatedAddresses = addresses.filter((addr) => addr.id !== addressId);
-    setAddresses(updatedAddresses.length > 0 ? updatedAddresses : null);
-  };
-
+const AddressList = ({ addresses, onDeleteAddress }: AddressListProps) => {
   return (
     <div className="bg-white rounded-lg shadow-sm">
       <h2 className="text-lg font-semibold text-gray-900 p-6 border-b">
@@ -31,7 +25,7 @@ const AddressList = ({ addresses, setAddresses }: AddressListProps) => {
               key={i}
               className="hover:bg-gray-50 transition-colors duration-150"
             >
-              <Address address={address} onDelete={handleDelete} />
+              <Address address={address} onDelete={onDeleteAddress} />
             </li>
           ))}
         </ul>
