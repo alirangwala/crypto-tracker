@@ -74,7 +74,27 @@ describe("Addresses API", () => {
       expect(dbAddress).toBeTruthy();
       expect(dbAddress?.transactions).toHaveLength(1);
     });
+    it("should handle address already existing (409 Conflict)", async () => {
+      await prisma.address.create({
+        data: {
+          ...sampleAddress,
+          transactions: {
+            create: sampleAddress.transactions,
+          },
+        },
+      });
 
+      const request = new NextRequest("http://localhost:3000/api/addresses", {
+        method: "POST",
+        body: JSON.stringify(sampleAddress),
+      });
+
+      const response = await POST(request);
+      const data = await response.json();
+
+      expect(response.status).toBe(409);
+      expect(data.error).toBe("Address with this ID already exists");
+    });
     it("should handle invalid address data", async () => {
       const request = new NextRequest("http://localhost:3000/api/addresses", {
         method: "POST",
@@ -146,7 +166,7 @@ describe("Addresses API", () => {
 
       const response = await DELETE(request, context);
 
-      expect(response.status).toBe(500);
+      expect(response.status).toBe(404);
       const data = await response.json();
       expect(data.error).toBeTruthy();
     });

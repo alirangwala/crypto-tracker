@@ -20,6 +20,17 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const data = await request.json();
+    const existingAddress = await prisma.address.findUnique({
+      where: { id: data.id },
+    });
+
+    if (existingAddress) {
+      return NextResponse.json(
+        { error: "Address with this ID already exists" },
+        { status: 409 }
+      );
+    }
+
     const address = await prisma.address.create({
       data: {
         id: data.id,

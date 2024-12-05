@@ -41,9 +41,6 @@ export default function Home() {
 
   const handleDeleteAddress = async (addressId: string) => {
     try {
-      await fetch(`/api/addresses/${addressId}`, {
-        method: "DELETE",
-      });
       setAddresses(addresses?.filter((addr) => addr.id !== addressId) || null);
     } catch (error) {
       console.error("Failed to delete address:", error);

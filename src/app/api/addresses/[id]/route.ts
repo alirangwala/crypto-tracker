@@ -5,9 +5,15 @@ export async function DELETE(
   request: Request,
   context: { params: { id: string } }
 ) {
-  const id = context.params.id;
-
   try {
+    const id = await context.params.id;
+    const address = await prisma.address.findUnique({
+      where: { id },
+    });
+
+    if (!address) {
+      return NextResponse.json({ error: "Address not found" }, { status: 404 });
+    }
     // Need to delete transactions first
     await prisma.transaction.deleteMany({
       where: {
